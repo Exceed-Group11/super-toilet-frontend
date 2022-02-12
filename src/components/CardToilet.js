@@ -1,14 +1,21 @@
 import React from "react"
+import Status from "./Status";
 
-const CardToilet = () => {
-  return (
-    <div className='card'>
-        <div className='status'></div>
-        <p>Toilet No. ?</p>
-        <p>Time Enter : HH:MM</p>
-        <p>Time Use : MM:SS</p>
-    </div>
-  )
+const CardToilet = ({ id, status}) => {
+
+
+    return (
+        <div className='card'>
+            <Status status={status}/>
+            <div className="card-detail">
+                <p className="toilet-no" >Toilet No. {id}</p>
+                <p className="time-in" >Time in : HH:MM</p>
+                <p className="time-use" >Time Use : MM:SS</p>
+            </div>
+        </div>
+    )
 }
+
+
 
 export default CardToilet;
