@@ -1,28 +1,42 @@
 import axios from 'axios'
-// import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 // import { useParams } from 'react-router-dom'
 import Banner from '../components/Banner'
 import CardToilet from '../components/CardToilet'
 import EstimateTime from '../components/EstimateTime'
 
+const url = 'https://ecourse.cpe.ku.ac.th/exceed11/api/toilet/'
+const urlEst = 'https://ecourse.cpe.ku.ac.th/exceed11/api/toilet/statistic/'
+
 const Home = () => {
-    const toilet1 = 1
-    const toilet2 = 2
-    const toilet3 = 3
-    const toiletStatus1 = getToiletStatus(1)
-    const toiletStatus2 = getToiletStatus(2)
-    const toiletStatus3 = getToiletStatus(3)
-    // const toiletTime1 = getToiletTime(1)
+    const [toiletState, setToiletState] = useState([])
+    const [estTime, setEstTime] = useState('')
 
-    console.log(getToiletStatus(1))
 
-    async function getToiletStatus (id) {
-        const response = await axios.get(
-            `http://8e16-27-55-84-122.ngrok.io/toilet/${id}`)
-        const status = await response.data.results[0].status
-        console.log(status)
-        return status
+    const getToilet = async () => {
+        const response = await axios.get(url)
+        const toilets = response.data.result
+        setToiletState(toilets)
     }
+
+    const getEstTime = async () => {
+        const response = await axios.get(urlEst)
+        const estTime = response.data.time_average
+        setEstTime(estTime)
+    }
+
+    useEffect(() => {
+        getToilet()
+        getEstTime()
+    }, [])
+
+    console.log(estTime)
+
+    // async function getToiletStatus (id) {
+    //     const response = await axios.get(
+    //         `http://8e16-27-55-84-122.ngrok.io/toilet/${id}`)
+    //     return response
+    // }
 
     // async function getToiletTime (id) {
     //     const response = await axios.get(
@@ -32,24 +46,30 @@ const Home = () => {
     //     return time
     // }
 
-    // var date = new Date(toiletTime1 * 1000);
-    // var hours = date.getHours();
-    // var minutes = "0" + date.getMinutes();
-    // var formattedTime = hours + ':' + minutes.substr(-2);
-    // console.log(date)
-    // console.log(hours)
-    // console.log(minutes)
-    // console.log(formattedTime)
-   
+    function timeFormat(time) {
+        var date = new Date(time * 1000)
+        var hours = date.getHours();
+        var minutes = "0" + date.getMinutes();
+        var formattedTime = hours + ':' + minutes.substr(-2);
+        return formattedTime
+    } 
+
     return (
         <div className='container'>
             <Banner />
-            <EstimateTime/>
-            <div className='card-list'>
-                <CardToilet id={toilet1} status={toiletStatus1} />
-                <CardToilet id={toilet2} status={toiletStatus2} />
-                <CardToilet id={toilet3} status={toiletStatus3} />
-            </div>
+            <EstimateTime est={estTime}/>
+            <ul className='card-list'>
+                {toiletState.map((toilet) => {
+                    const { toilet_id, time_in, status } = toilet;
+                    const formattedTime = timeFormat(time_in)
+                    return (
+                        <li key={toilet_id}>
+                            <CardToilet id={toilet_id} status={status} time={formattedTime}
+                            />
+                        </li>
+                    )
+                })}
+            </ul>
         </div>
     )
 }

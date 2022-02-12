@@ -49,3 +49,7 @@ body {
 .time-use {
   margin: 1rem;
 }
+
+li {
+  display: block;
+}
